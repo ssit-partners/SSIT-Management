@@ -1,0 +1,19 @@
+F:\Repositories\SmartSourceIT-EUS-Agent\SSIT-EUS-Agent\bin\Debug\netcoreapp3.1\SSIT-EUS-Agent.exe
+F:\Repositories\SmartSourceIT-EUS-Agent\SSIT-EUS-Agent\bin\Debug\netcoreapp3.1\SSIT-EUS-Agent.deps.json
+F:\Repositories\SmartSourceIT-EUS-Agent\SSIT-EUS-Agent\bin\Debug\netcoreapp3.1\SSIT-EUS-Agent.runtimeconfig.json
+F:\Repositories\SmartSourceIT-EUS-Agent\SSIT-EUS-Agent\bin\Debug\netcoreapp3.1\SSIT-EUS-Agent.runtimeconfig.dev.json
+F:\Repositories\SmartSourceIT-EUS-Agent\SSIT-EUS-Agent\bin\Debug\netcoreapp3.1\SSIT-EUS-Agent.dll
+F:\Repositories\SmartSourceIT-EUS-Agent\SSIT-EUS-Agent\bin\Debug\netcoreapp3.1\SSIT-EUS-Agent.pdb
+F:\Repositories\SmartSourceIT-EUS-Agent\SSIT-EUS-Agent\obj\Debug\netcoreapp3.1\SSIT-EUS-Agent.csprojAssemblyReference.cache
+F:\Repositories\SmartSourceIT-EUS-Agent\SSIT-EUS-Agent\obj\Debug\netcoreapp3.1\SmartSource IT.g.cs
+F:\Repositories\SmartSourceIT-EUS-Agent\SSIT-EUS-Agent\obj\Debug\netcoreapp3.1\App.g.cs
+F:\Repositories\SmartSourceIT-EUS-Agent\SSIT-EUS-Agent\obj\Debug\netcoreapp3.1\SSIT-EUS-Agent_MarkupCompile.cache
+F:\Repositories\SmartSourceIT-EUS-Agent\SSIT-EUS-Agent\obj\Debug\netcoreapp3.1\SSIT-EUS-Agent_MarkupCompile.lref
+F:\Repositories\SmartSourceIT-EUS-Agent\SSIT-EUS-Agent\obj\Debug\netcoreapp3.1\SmartSource IT.baml
+F:\Repositories\SmartSourceIT-EUS-Agent\SSIT-EUS-Agent\obj\Debug\netcoreapp3.1\SSIT-EUS-Agent.g.resources
+F:\Repositories\SmartSourceIT-EUS-Agent\SSIT-EUS-Agent\obj\Debug\netcoreapp3.1\SSIT-EUS-Agent.AssemblyInfoInputs.cache
+F:\Repositories\SmartSourceIT-EUS-Agent\SSIT-EUS-Agent\obj\Debug\netcoreapp3.1\SSIT-EUS-Agent.AssemblyInfo.cs
+F:\Repositories\SmartSourceIT-EUS-Agent\SSIT-EUS-Agent\obj\Debug\netcoreapp3.1\SSIT-EUS-Agent.csproj.CoreCompileInputs.cache
+F:\Repositories\SmartSourceIT-EUS-Agent\SSIT-EUS-Agent\obj\Debug\netcoreapp3.1\SSIT-EUS-Agent.dll
+F:\Repositories\SmartSourceIT-EUS-Agent\SSIT-EUS-Agent\obj\Debug\netcoreapp3.1\SSIT-EUS-Agent.pdb
+F:\Repositories\SmartSourceIT-EUS-Agent\SSIT-EUS-Agent\obj\Debug\netcoreapp3.1\SSIT-EUS-Agent.genruntimeconfig.cache

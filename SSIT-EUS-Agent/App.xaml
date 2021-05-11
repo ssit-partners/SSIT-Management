@@ -1,0 +1,9 @@
+﻿<Application x:Class="SSIT_EUS_Agent.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:SSIT_EUS_Agent"
+             StartupUri="SmartSource IT.xaml">
+    <Application.Resources>
+         
+    </Application.Resources>
+</Application>
