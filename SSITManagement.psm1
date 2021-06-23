@@ -60,56 +60,88 @@ Function Set-SSITFolderPaths {
     }
 }
 Function Get-SSITModules {
-    <#
-    .SYNOPSIS
-      Download latest modules from GitHub
-    .DESCRIPTION
-      Download latest modules from GitHub
-
-    .EXAMPLE
-    Get-SSITModules
-    #>
+<#
+.SYNOPSIS
+Download latest modules from GitHub
+.DESCRIPTION
+Download latest modules from GitHub
+Modified from https://gist.github.com/MarkTiedemann/c0adc1701f3f5c215fc2c2d5b1d5efd3
+#>
 
     [CmdletBinding()]  
     param (
+        [Parameter(Mandatory = $True)]
+        [string]$Repo,
+        [Parameter(Mandatory = $True)]
+        [string]$File
     )
+
 
     begin {
         Write-Verbose "$(Get-Date -Format u) : Begin $($MyInvocation.MyCommand)"
-
+        
+        Set-SSITFolderPaths
+        $WorkingFolder = "$env:systemdrive\SSIT"
+        $TempFolder = "$WorkingFolder\Temp"
+        $ScriptsFolder = "$WorkingFolder\Scripts"
+        
+        $Releases = "https://api.github.com/repos/$Repo/releases"
 
     }
 
     process {
         try {
-            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-            $response = Invoke-WebRequest "https://github.com/ssit-partners/SmartSourceIT-EUS-Agent/releases/latest" -UseBasicParsing
-            $url = "https://github.com/$(($response.links | Where-Object href -match 'dist.zip').href)"
+
+            Write-Verbose "$(Get-Date -Format u) : Determining latest release"
+            $Latest = (Invoke-WebRequest $Releases -UseBasicParsing | ConvertFrom-Json)[0]
             
+            $Download = $Latest.zipball_url
+            $Zip = "$TempFolder\$Name-$Tag.zip"
+            $Dir = "$ScriptsFolder\$Name-$Tag"
+            New-Item -ItemType Directory -Force -Path "$Dir" | Out-Null
+            
+            Invoke-WebRequest $Download -Out $Zip            
+            Expand-Archive -Path $Zip -DestinationPath $Dir
+            
+            # Cleaning up target dir
+            Remove-Item $ScriptsFolder\$Name -Recurse -Force -ErrorAction SilentlyContinue 
+            
+            # Moving from temp dir to target dir
+            Move-Item -Path $Dir -Destination $ScriptsFolder\$Name -Force
+            
+            # Removing temp files
+            Remove-Item $Zip -Force
+            Remove-Item $Dir -Recurse -Force
+
+            <#
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            $response = Invoke-WebRequest "https://github.com/ssit-partners/SSIT-Management/releases/latest" -UseBasicParsing
+            $url = "https://github.com/$(($response.links | Where-Object href -match 'dist.zip').href)"
+                        
             $installerName = "SSIT-Management.zip"            
-            $output = "$env:temp\$installerName"
+            $output = "$TempFolder\$installerName"
 
             Write-Verbose "$(Get-Date -Format u) : Downloading $url"
 
             $wc = New-Object System.Net.WebClient
             $wc.DownloadFile("$url", $output)   
 
-            Write-Verbose "$(Get-Date -Format u) : Extracting $output to $env:systemdrive\GXA\Scripts"
+            Write-Verbose "$(Get-Date -Format u) : Extracting $output to $ScriptsFolder"
 
-            New-Item -ItemType Directory -Force -Path "$env:systemdrive\GXA\Scripts" | Out-Null
             $shell_app = new-object -com shell.application
             $zip_file = $shell_app.namespace($output)
-            $destination = $shell_app.namespace("$env:systemdrive\GXA\Scripts")
+            $destination = $shell_app.namespace($ScriptsFolder)
             $destination.Copyhere($zip_file.items(), 0x14)
 
             Write-Verbose "$(Get-Date -Format u) : Fixing folder name"
-            $url -Match "https://github.com//GXANetworks/GXA_Managed_Tools/archive/v(?<version>.*).zip" | Out-Null
+            $url -Match "https://github.com//ssit-partners/SSIT-Management/archive/v(?<version>.*).zip" | Out-Null
             $version = $Matches['version']
-            Get-Item -Path "$env:systemdrive\GXA\Scripts\GXA_Managed_Tools" | Remove-Item -Recurse -Force
-            Rename-Item -Path "$env:systemdrive\GXA\Scripts\GXA_Managed_Tools-$version" -NewName "GXA_Managed_Tools"
+            Get-Item -Path "$ScriptsFolder\SSIT-Management" | Remove-Item -Recurse -Force
+            Rename-Item -Path "$ScriptsFolder\SSIT-Management-$version" -NewName "SSIT-Management"
 
             Write-Verbose "$(Get-Date -Format u) : Removing $output"
             Remove-Item -Path $output -Force
+            #>
 
         }
 
