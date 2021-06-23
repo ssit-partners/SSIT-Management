@@ -71,9 +71,9 @@ Modified from https://gist.github.com/MarkTiedemann/c0adc1701f3f5c215fc2c2d5b1d5
     [CmdletBinding()]  
     param (
         [Parameter(Mandatory = $True)]
-        [string]$Repo,
+        [string]$Git,
         [Parameter(Mandatory = $True)]
-        [string]$File
+        [string]$Repo
     )
 
 
@@ -83,9 +83,8 @@ Modified from https://gist.github.com/MarkTiedemann/c0adc1701f3f5c215fc2c2d5b1d5
         Set-SSITFolderPaths
         $WorkingFolder = "$env:systemdrive\SSIT"
         $TempFolder = "$WorkingFolder\Temp"
-        $ScriptsFolder = "$WorkingFolder\Scripts"
-        
-        $Releases = "https://api.github.com/repos/$Repo/releases"
+        $ScriptsFolder = "$WorkingFolder\Scripts"        
+        $Releases = "https://api.github.com/repos/$Git/$Repo/releases"
 
     }
 
@@ -93,55 +92,21 @@ Modified from https://gist.github.com/MarkTiedemann/c0adc1701f3f5c215fc2c2d5b1d5
         try {
 
             Write-Verbose "$(Get-Date -Format u) : Determining latest release"
-            $Latest = (Invoke-WebRequest $Releases -UseBasicParsing | ConvertFrom-Json)[0]
-            
-            $Download = $Latest.zipball_url
-            $Zip = "$TempFolder\$Name-$Tag.zip"
-            $Dir = "$ScriptsFolder\$Name-$Tag"
+            $Latest = (Invoke-WebRequest $Releases -UseBasicParsing | ConvertFrom-Json)[0]            
+            $DownloadUrl = $Latest.zipball_url
+            $ZipFile = "$TempFolder\$Repo.zip"
+            $Dir = "$TempFolder\$Repo"
             New-Item -ItemType Directory -Force -Path "$Dir" | Out-Null
-            
-            Invoke-WebRequest $Download -Out $Zip            
-            Expand-Archive -Path $Zip -DestinationPath $Dir
-            
-            # Cleaning up target dir
-            Remove-Item $ScriptsFolder\$Name -Recurse -Force -ErrorAction SilentlyContinue 
-            
-            # Moving from temp dir to target dir
-            Move-Item -Path $Dir -Destination $ScriptsFolder\$Name -Force
-            
-            # Removing temp files
-            Remove-Item $Zip -Force
+            Invoke-WebRequest $DownloadUrl -Out $ZipFile
+            Expand-Archive -Path $ZipFile -DestinationPath $Dir
+            $ExpandedDirectory = "$Dir\$((Get-ChildItem $Dir).Name)"
+
+            Remove-Item $ScriptsFolder\$Repo -Recurse -Force -ErrorAction SilentlyContinue 
+            New-Item -ItemType Directory -Force -Path "$ScriptsFolder\$Repo" | Out-Null
+            Copy-Item -Path "$ExpandedDirectory\*" -Destination $ScriptsFolder\$Repo -Force
+
+            Remove-Item $ZipFile -Force
             Remove-Item $Dir -Recurse -Force
-
-            <#
-            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-            $response = Invoke-WebRequest "https://github.com/ssit-partners/SSIT-Management/releases/latest" -UseBasicParsing
-            $url = "https://github.com/$(($response.links | Where-Object href -match 'dist.zip').href)"
-                        
-            $installerName = "SSIT-Management.zip"            
-            $output = "$TempFolder\$installerName"
-
-            Write-Verbose "$(Get-Date -Format u) : Downloading $url"
-
-            $wc = New-Object System.Net.WebClient
-            $wc.DownloadFile("$url", $output)   
-
-            Write-Verbose "$(Get-Date -Format u) : Extracting $output to $ScriptsFolder"
-
-            $shell_app = new-object -com shell.application
-            $zip_file = $shell_app.namespace($output)
-            $destination = $shell_app.namespace($ScriptsFolder)
-            $destination.Copyhere($zip_file.items(), 0x14)
-
-            Write-Verbose "$(Get-Date -Format u) : Fixing folder name"
-            $url -Match "https://github.com//ssit-partners/SSIT-Management/archive/v(?<version>.*).zip" | Out-Null
-            $version = $Matches['version']
-            Get-Item -Path "$ScriptsFolder\SSIT-Management" | Remove-Item -Recurse -Force
-            Rename-Item -Path "$ScriptsFolder\SSIT-Management-$version" -NewName "SSIT-Management"
-
-            Write-Verbose "$(Get-Date -Format u) : Removing $output"
-            Remove-Item -Path $output -Force
-            #>
 
         }
 
