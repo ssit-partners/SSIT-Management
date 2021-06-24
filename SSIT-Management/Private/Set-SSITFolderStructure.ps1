@@ -35,7 +35,6 @@ function Set-SSITFolderStructure {
 
     end {
         Write-Verbose -Message "$(Get-Date -Format u) : Ending $($MyInvocation.InvocationName)..."
-        return 0    
     }
 
 }

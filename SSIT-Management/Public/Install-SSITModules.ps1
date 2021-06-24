@@ -17,15 +17,13 @@ Function Install-SSITModules {
     
     
         begin {
-            Write-Verbose "$(Get-Date -Format u) : Begin $($MyInvocation.MyCommand)"
+            Write-SSITLogs -LogName "Management" -LogMessage "Begin $($MyInvocation.MyCommand)" -WriteToWindowsEventLog
+
+            Set-SSITFolderStructure
             
             $WorkingFolder = "$env:systemdrive\SSIT"
             $TempFolder = "$WorkingFolder\Temp"
             $ScriptsFolder = "$WorkingFolder\Scripts"        
-            
-            New-Item -ItemType Directory -Force -Path "$WorkingFolder" | Out-Null
-            New-Item -ItemType Directory -Force -Path "$TempFolder" | Out-Null
-            New-Item -ItemType Directory -Force -Path "$ScriptsFolder" | Out-Null
             
             $Releases = "https://api.github.com/repos/$Git/$Repo/releases"
             $Latest = (Invoke-WebRequest $Releases -UseBasicParsing | ConvertFrom-Json)[0] 
@@ -38,25 +36,34 @@ Function Install-SSITModules {
     
         process {
             try {
+                Write-SSITLogs -LogName "Management" -LogMessage "Downloading $DownloadUrl to $ZipFile"
                 Invoke-WebRequest $DownloadUrl -Out $ZipFile
+
+                Write-SSITLogs -LogName "Management" -LogMessage "Expanding: $ZipFile"
                 Expand-Archive -Path $ZipFile -DestinationPath $TempDirectory -Force
-                $ExpandedDirectory = "$TempDirectory\$((Get-ChildI tem $TempDirectory).Name)"
+                $ExpandedDirectory = "$TempDirectory\$((Get-ChildItem $TempDirectory).Name)"
+                
+                Write-SSITLogs -LogName "Management" -LogMessage "Preparing Folder Structure at $ScriptsFolder\$Repo"
                 Remove-Item $ScriptsFolder\$Repo -Recurse -Force -ErrorAction SilentlyContinue 
                 New-Item -ItemType Directory -Force -Path "$ScriptsFolder\$Repo" | Out-Null
-                Copy-Item -Path "$ExpandedDirectory\*" -Destination $ScriptsFolder\$Repo -Force
+                
+                Write-SSITLogs -LogName "Management" -LogMessage "Copying Contents"
+                Copy-Item -Path "$ExpandedDirectory\*" -Destination $ScriptsFolder\$Repo -Force -Recurse
+
+                Write-SSITLogs -LogName "Management" -LogMessage "Cleaning up temp files"
                 Remove-Item $ZipFile -Force
                 Remove-Item $TempDirectory -Recurse -Force
             }
     
             catch {
                 $errorMessage = $_.Exception.Message
+                Write-SSITLogs -LogName "Management" -LogType "Error" -LogMessage "[$errorMessage]"
                 Write-Error -Message "$(Get-Date -Format u) : Error: [$errorMessage]"
             }
     
         }
     
         end {
-            Write-Verbose -Message "$(Get-Date -Format u) : Ending $($MyInvocation.InvocationName)..."
-            return 0    
+            Write-SSITLogs -LogName "Management" -LogMessage "Ending $($MyInvocation.InvocationName)`n" -WriteToWindowsEventLog
         }
     }
