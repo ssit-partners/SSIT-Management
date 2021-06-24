@@ -1,7 +1,7 @@
 #requires -version 3
 <#
 .SYNOPSIS
-Collection of functions to for SmartSource IT Device Management
+Collection of functions for SmartSource IT Device Management
 
 .DESCRIPTION
 Developed for RealPage SmartSource IT 
@@ -59,7 +59,7 @@ Function Set-SSITFolderPaths {
         return 0    
     }
 }
-Function Get-SSITModules {
+Function Install-SSITModules {
 <#
 .SYNOPSIS
 Download latest modules from GitHub
@@ -70,44 +70,43 @@ Modified from https://gist.github.com/MarkTiedemann/c0adc1701f3f5c215fc2c2d5b1d5
 
     [CmdletBinding()]  
     param (
-        [Parameter(Mandatory = $True)]
-        [string]$Git,
-        [Parameter(Mandatory = $True)]
-        [string]$Repo
+        [Parameter(Mandatory = $False)]
+        [string]$Git="ssit-partners",
+        [Parameter(Mandatory = $False)]
+        [string]$Repo="SSIT-Management"
     )
 
 
     begin {
         Write-Verbose "$(Get-Date -Format u) : Begin $($MyInvocation.MyCommand)"
         
-        Set-SSITFolderPaths
         $WorkingFolder = "$env:systemdrive\SSIT"
         $TempFolder = "$WorkingFolder\Temp"
         $ScriptsFolder = "$WorkingFolder\Scripts"        
+        
+        New-Item -ItemType Directory -Force -Path "$WorkingFolder" | Out-Null
+        New-Item -ItemType Directory -Force -Path "$TempFolder" | Out-Null
+        New-Item -ItemType Directory -Force -Path "$ScriptsFolder" | Out-Null
+        
         $Releases = "https://api.github.com/repos/$Git/$Repo/releases"
+        $Latest = (Invoke-WebRequest $Releases -UseBasicParsing | ConvertFrom-Json)[0] 
+        $DownloadUrl = $Latest.zipball_url
+        $ZipFile = "$TempFolder\$Repo.zip"
+        $TempDirectory = "$TempFolder\$Repo"
+        New-Item -ItemType Directory -Force -Path "$TempDirectory" | Out-Null
 
     }
 
     process {
         try {
-
-            Write-Verbose "$(Get-Date -Format u) : Determining latest release"
-            $Latest = (Invoke-WebRequest $Releases -UseBasicParsing | ConvertFrom-Json)[0]            
-            $DownloadUrl = $Latest.zipball_url
-            $ZipFile = "$TempFolder\$Repo.zip"
-            $Dir = "$TempFolder\$Repo"
-            New-Item -ItemType Directory -Force -Path "$Dir" | Out-Null
             Invoke-WebRequest $DownloadUrl -Out $ZipFile
-            Expand-Archive -Path $ZipFile -DestinationPath $Dir
-            $ExpandedDirectory = "$Dir\$((Get-ChildItem $Dir).Name)"
-
+            Expand-Archive -Path $ZipFile -DestinationPath $TempDirectory -Force
+            $ExpandedDirectory = "$TempDirectory\$((Get-ChildI tem $TempDirectory).Name)"
             Remove-Item $ScriptsFolder\$Repo -Recurse -Force -ErrorAction SilentlyContinue 
             New-Item -ItemType Directory -Force -Path "$ScriptsFolder\$Repo" | Out-Null
             Copy-Item -Path "$ExpandedDirectory\*" -Destination $ScriptsFolder\$Repo -Force
-
             Remove-Item $ZipFile -Force
-            Remove-Item $Dir -Recurse -Force
-
+            Remove-Item $TempDirectory -Recurse -Force
         }
 
         catch {
@@ -174,6 +173,6 @@ Function Set-SSITTrustedPublisher {
 }
 
 #-----------------------------------------------------------[Module Export]------------------------------------------------------------
-Export-ModuleMember -Function Set-SSITFolderPaths, Get-SSITModules, Set-SSITTrustedPublisher
+Export-ModuleMember -Function Set-SSITFolderPaths, Install-SSITModules, Set-SSITTrustedPublisher
 
 #-----------------------------------------------------------[Signature]------------------------------------------------------------
