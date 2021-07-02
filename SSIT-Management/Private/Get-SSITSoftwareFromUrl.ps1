@@ -1,19 +1,27 @@
-Function Install-FunctionTemplate {
+Function Get-SSITSoftwareFromUrl {
     [CmdletBinding()]  
     param (
+        [Parameter(Mandatory = $true)]
+        [String]$Url
     )
 
 
     begin {
-        $ProgressPreference = 'silentlyContinue'
+        $progresspreference = 'silentlyContinue'
         $LogName = "Application"
         Write-SSITLogs -LogName $LogName -LogMessage "Begin $($MyInvocation.MyCommand)" -WriteToWindowsEventLog
+        $TempFolder = "$env:systemdrive\SSIT\Temp"
+        $FileName = Split-Path -Path $Url -Leaf
 
     }
 
     process {
         try {
 
+            Write-SSITLogs -LogName $LogName -LogMessage "Downloading $Url to $TempFolder"
+    
+            $wc = New-Object System.Net.WebClient
+            $wc.DownloadFile($Url, "$TempFolder\$FileName")    
             
         }
 
@@ -26,6 +34,7 @@ Function Install-FunctionTemplate {
     }
 
     end {
+        return "$TempFolder\$FileName"
         Write-SSITLogs -LogName $LogName -LogMessage "Ending $($MyInvocation.InvocationName)`n" -WriteToWindowsEventLog
     }
 }

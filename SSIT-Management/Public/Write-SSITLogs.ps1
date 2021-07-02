@@ -34,7 +34,7 @@ Function Write-SSITLogs {
             if ( !( Test-Path $Log ) ) {
                 New-Item -Path $LogPath -Name $LogFile -Type "file" | Out-Null
             }
-            if ( !(Get-EventLog -LogName "Application" -Source "SSIT-$LogName" ) ) {
+            if ( !(Get-EventLog -LogName "Application" -Source "SSIT-$LogName" -ErrorAction SilentlyContinue ) ) {
                 New-EventLog -LogName "Application" -Source "SSIT-$LogName"
             }
         }

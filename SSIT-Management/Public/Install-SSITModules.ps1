@@ -17,6 +17,7 @@ Function Install-SSITModules {
     
     
         begin {
+            $progresspreference = 'silentlyContinue'
             Write-SSITLogs -LogName "Management" -LogMessage "Begin $($MyInvocation.MyCommand)" -WriteToWindowsEventLog
 
             Set-SSITFolderStructure

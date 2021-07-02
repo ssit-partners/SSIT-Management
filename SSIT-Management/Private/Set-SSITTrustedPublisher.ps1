@@ -21,6 +21,7 @@ Function Set-SSITTrustedPublisher {
     )
 
     begin {
+        $progresspreference = 'silentlyContinue'
         Write-Verbose "$(Get-Date -Format u) : Begin $($MyInvocation.MyCommand)"
         $Cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
         $Cert.Import((((Get-AuthenticodeSignature "$FilePath").SignerCertificate).Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Cert)))

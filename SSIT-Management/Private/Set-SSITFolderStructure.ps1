@@ -5,6 +5,7 @@ function Set-SSITFolderStructure {
     )
 
     begin {
+        $progresspreference = 'silentlyContinue'
         Write-Verbose "$(Get-Date -Format u) : Begin $($MyInvocation.MyCommand)"
 
         $FolderPaths = @(
